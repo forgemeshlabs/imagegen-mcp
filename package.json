@@ -1,11 +1,11 @@
 {
-  "name": "imagegen-mcp",
+  "name": "coinopai-imagegen",
   "version": "1.0.0",
   "mcpName": "io.github.clawdbotworker/imagegen-mcp",
   "description": "MCP server for AI image generation via x402 micropayments on Base — $0.10 USDC per image",
   "main": "index.js",
   "bin": {
-    "imagegen-mcp": "index.js"
+    "coinopai-imagegen": "index.js"
   },
   "files": [
     "index.js",

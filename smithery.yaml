@@ -14,7 +14,7 @@ startCommand:
   commandFunction: |-
     (config) => ({
       command: 'npx',
-      args: ['-y', 'imagegen-mcp'],
+      args: ['-y', 'coinopai-imagegen'],
       env: {
         WALLET_PRIVATE_KEY: config.walletPrivateKey
       }

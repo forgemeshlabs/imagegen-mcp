@@ -22,7 +22,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) o
   "mcpServers": {
     "imagegen": {
       "command": "npx",
-      "args": ["-y", "imagegen-mcp"],
+      "args": ["-y", "coinopai-imagegen"],
       "env": {
         "WALLET_PRIVATE_KEY": "0x<your-base-wallet-private-key>"
       }
@@ -34,7 +34,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) o
 ## npx usage
 
 ```bash
-WALLET_PRIVATE_KEY=0x<your-key> npx imagegen-mcp
+WALLET_PRIVATE_KEY=0x<your-key> npx coinopai-imagegen
 ```
 
 ## Tool reference
