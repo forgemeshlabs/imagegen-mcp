@@ -1,0 +1,48 @@
+{
+  "name": "imagegen-mcp",
+  "version": "1.0.0",
+  "mcpName": "io.github.clawdbotworker/imagegen-mcp",
+  "description": "MCP server for AI image generation via x402 micropayments on Base — $0.10 USDC per image",
+  "main": "index.js",
+  "bin": {
+    "imagegen-mcp": "index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "server.json",
+    "smithery.yaml"
+  ],
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "x402",
+    "image-generation",
+    "ai",
+    "agent",
+    "coinbase",
+    "base",
+    "usdc",
+    "micropayments",
+    "claude",
+    "imagegen"
+  ],
+  "author": "CoinOpAI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clawdbotworker/imagegen-mcp.git"
+  },
+  "homepage": "https://imagegen.coinopai.com",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.1",
+    "@x402/core": "^2.11.0",
+    "@x402/evm": "^2.11.0",
+    "viem": "^2.0.0"
+  }
+}

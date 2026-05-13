@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.clawdbotworker/imagegen-mcp",
+  "description": "MCP server for AI image generation via x402 micropayments on Base. $0.10 USDC per image, paid automatically from your wallet.",
+  "repository": {
+    "url": "https://github.com/clawdbotworker/imagegen-mcp",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "imagegen-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "WALLET_PRIVATE_KEY",
+          "description": "Dedicated low-balance Base wallet private key for x402 USDC micropayments. Do not use your primary wallet. $1 USDC ≈ 10 images.",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

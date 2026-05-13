@@ -1,0 +1,23 @@
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - walletPrivateKey
+    properties:
+      walletPrivateKey:
+        type: string
+        description: >-
+          Dedicated low-balance Base wallet private key for x402 USDC micropayments.
+          Use a purpose-built wallet, not your primary wallet.
+          $1 USDC covers approximately 10 image generations.
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', 'imagegen-mcp'],
+      env: {
+        WALLET_PRIVATE_KEY: config.walletPrivateKey
+      }
+    })
+  exampleConfig:
+    walletPrivateKey: '0x...'
