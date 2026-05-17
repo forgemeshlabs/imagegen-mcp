@@ -1,81 +1,103 @@
-# imagegen-mcp
+# forgemesh-imagegen
 
-MCP server for AI image generation, powered by [imagegen.coinopai.com](https://imagegen.coinopai.com). Payments are handled automatically via x402 micropayments on Base mainnet — no API keys, no subscriptions, just a funded wallet.
+**MCP server for AI image generation.** Generate images, remove backgrounds, upscale to 4x HD — all from a single MCP tool call. Payments handled automatically in USDC on Base mainnet via x402. No API key. No subscription. Pay per image.
 
-**Cost: $0.10 USDC per image** (Base mainnet)
+Part of the [ForgeMesh](https://github.com/forgemeshlabs/forgemesh) ecosystem — infrastructure for autonomous agents.
 
-## What it does
+---
 
-Exposes a single `generate_image` tool that any MCP-compatible client (Claude Desktop, Cursor, Windsurf, etc.) can call. When invoked, the server automatically pays the $0.10 USDC gate and returns a PNG image URL.
+## Tools
 
-## Requirements
+| Tool | What it does | Price |
+|---|---|---|
+| `generate_image` | Text-to-image generation | $0.10 USDC |
+| `generate_clean` | Generate + background removal | $0.15 USDC |
+| `generate_hd` | Generate + 4x upscale (HD) | $0.20 USDC |
+| `generate_pro` | Generate + bg removal + 4x upscale | $0.30 USDC |
 
-- Node.js 18+
-- A Base wallet private key funded with USDC
+All tools accept `prompt` (required) and `aspect` (optional: `1:1`, `16:9`, `9:16`, `4:3`).
 
-## Claude Desktop config
+---
 
-Add to `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+## Install
+
+### Claude Desktop
+
+Add to `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "imagegen": {
+    "forgemesh-imagegen": {
       "command": "npx",
-      "args": ["-y", "coinopai-imagegen"],
+      "args": ["-y", "forgemesh-imagegen"],
       "env": {
-        "WALLET_PRIVATE_KEY": "0x<your-base-wallet-private-key>"
+        "WALLET_PRIVATE_KEY": "0x..."
       }
     }
   }
 }
 ```
 
-## npx usage
+### Claude Code
 
 ```bash
-WALLET_PRIVATE_KEY=0x<your-key> npx coinopai-imagegen
+claude mcp add forgemesh-imagegen -- npx -y forgemesh-imagegen
 ```
 
-## Tool reference
-
-### `generate_image`
-
-Generate an AI image from a text prompt.
-
-**Inputs:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `prompt` | string | Yes | Natural language image description |
-| `aspect` | string | No | `1:1` (default), `16:9`, `9:16`, `4:3` |
-
-**Output:**
-
-```json
-{
-  "image_url": "https://...",
-  "prompt": "your prompt",
-  "aspect": "1:1",
-  "generated_at": "2026-05-13T00:00:00.000Z"
-}
+Then set the env var:
+```bash
+export WALLET_PRIVATE_KEY=0x...
 ```
 
-**Example prompts:**
-- `"a cyberpunk wolf in neon rain"`
-- `"a peaceful mountain lake at sunrise, photorealistic"`
-- `"abstract geometric art, vibrant colors, 4K"`
+---
 
-## Cost disclosure
+## Requirements
 
-Each `generate_image` call costs **$0.10 USDC** deducted from your `WALLET_PRIVATE_KEY` wallet on Base mainnet. Use a purpose-built low-balance wallet, not your primary wallet.
+- A Base mainnet wallet private key with USDC
+- $1 USDC ≈ 10 base images, 6 clean, 5 HD, or 3 pro
+- No other API keys needed
 
-$1 USDC ≈ 10 images.
+Get USDC on Base: [Coinbase](https://coinbase.com) → Bridge to Base, or buy directly on Base.
 
-## Smithery
+---
 
-Available on [Smithery](https://smithery.ai) — search for `imagegen-mcp`.
+## Example usage
+
+```
+generate_image(prompt="a red panda in a spacesuit", aspect="1:1")
+→ { image_url: "https://...", prompt: "...", aspect: "1:1", tier: "image" }
+
+generate_clean(prompt="a product photo of a ceramic mug")
+→ { image_url: "https://...", tier: "clean" }   // transparent PNG
+
+generate_hd(prompt="a futuristic city at night, cyberpunk style")
+→ { image_url: "https://...", tier: "hd" }       // 4096x4096
+
+generate_pro(prompt="a logo mark, geometric eagle")
+→ { image_url: "https://...", tier: "pro" }      // transparent + HD
+```
+
+---
+
+## How it works
+
+Each tool call makes an HTTP request to the ForgeMesh imagegen service gated by the [x402 protocol](https://x402.org). If payment is required, the MCP automatically signs and broadcasts a USDC transfer from your wallet on Base mainnet — then retries the request. You see the result, your wallet is charged, no manual steps.
+
+- Network: Base mainnet (eip155:8453)
+- Token: USDC
+- Facilitator: Coinbase CDP
+
+---
+
+## Links
+
+- [ForgeMesh](https://forgemesh.io) — ecosystem overview
+- [GitHub](https://github.com/forgemeshlabs/forgemesh-imagegen)
+- [x402 Protocol](https://x402.org)
+
+---
 
 ## License
 
-MIT
+MIT © ForgeMesh Labs

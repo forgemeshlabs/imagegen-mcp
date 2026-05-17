@@ -1,17 +1,15 @@
 {
-  "name": "coinopai-imagegen",
+  "name": "forgemesh-imagegen",
   "version": "1.0.0",
-  "mcpName": "io.github.clawdbotworker/imagegen-mcp",
-  "description": "MCP server for AI image generation via x402 micropayments on Base — $0.10 USDC per image",
+  "mcpName": "io.github.forgemeshlabs/imagegen-mcp",
+  "description": "MCP server for AI image generation — generate, clean (bg removal), HD (4x upscale), Pro. Pay per image in USDC via x402 on Base. No API key needed.",
   "main": "index.js",
   "bin": {
-    "coinopai-imagegen": "index.js"
+    "forgemesh-imagegen": "index.js"
   },
   "files": [
     "index.js",
-    "README.md",
-    "server.json",
-    "smithery.yaml"
+    "README.md"
   ],
   "scripts": {
     "start": "node index.js"
@@ -21,24 +19,34 @@
   },
   "keywords": [
     "mcp",
-    "x402",
+    "model-context-protocol",
+    "imagegen",
+    "imagegen-mcp",
     "image-generation",
-    "ai",
-    "agent",
-    "coinbase",
-    "base",
+    "ai-image",
+    "image-upscaling",
+    "background-removal",
+    "forgemesh",
+    "x402",
     "usdc",
+    "base",
     "micropayments",
+    "agent-commerce",
     "claude",
-    "imagegen"
+    "ai-agents",
+    "generative-ai",
+    "text-to-image"
   ],
-  "author": "CoinOpAI",
+  "author": "ForgeMesh Labs",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clawdbotworker/imagegen-mcp.git"
+    "url": "https://github.com/forgemeshlabs/forgemesh-imagegen.git"
   },
-  "homepage": "https://imagegen.coinopai.com",
+  "homepage": "https://github.com/forgemeshlabs/forgemesh-imagegen",
+  "bugs": {
+    "url": "https://github.com/forgemeshlabs/forgemesh-imagegen/issues"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.10.1",
     "@x402/core": "^2.11.0",

@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-
 const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 const { CallToolRequestSchema, ListToolsRequestSchema } = require("@modelcontextprotocol/sdk/types.js");
@@ -14,53 +10,74 @@ const { toClientEvmSigner } = require("@x402/evm");
 const { privateKeyToAccount } = require("viem/accounts");
 
 const BASE_URL = "https://imagegen.coinopai.com";
+const VALID_ASPECTS = ["1:1", "16:9", "9:16", "4:3"];
 
 const TOOLS = [
   {
     name: "generate_image",
-    description: "Generate an AI image from a text prompt. Costs $0.10 USDC per image, paid automatically via x402 on Base mainnet. Returns a PNG image URL.",
+    description: "Generate an AI image from a text prompt. Returns a PNG image URL. Costs $0.10 USDC on Base mainnet — paid automatically.",
     inputSchema: {
       type: "object",
       properties: {
-        prompt: {
-          type: "string",
-          description: "Natural language description of the image to generate"
-        },
-        aspect: {
-          type: "string",
-          description: "Aspect ratio: 1:1 (default, 1024x1024), 16:9 (1024x576), 9:16 (576x1024), 4:3 (1024x768)",
-          enum: ["1:1", "16:9", "9:16", "4:3"]
-        }
+        prompt: { type: "string", description: "Text description of the image to generate" },
+        aspect: { type: "string", enum: VALID_ASPECTS, description: "Aspect ratio — 1:1 (default), 16:9, 9:16, 4:3" },
       },
-      required: ["prompt"]
-    }
-  }
+      required: ["prompt"],
+    },
+  },
+  {
+    name: "generate_clean",
+    description: "Generate an AI image with the background removed. Returns a transparent PNG URL. Costs $0.15 USDC on Base mainnet.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: { type: "string", description: "Text description of the subject (background will be removed)" },
+        aspect: { type: "string", enum: VALID_ASPECTS, description: "Aspect ratio — 1:1 (default), 16:9, 9:16, 4:3" },
+      },
+      required: ["prompt"],
+    },
+  },
+  {
+    name: "generate_hd",
+    description: "Generate an AI image upscaled to 4x resolution. Returns a high-resolution image URL. Costs $0.20 USDC on Base mainnet.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: { type: "string", description: "Text description of the image to generate" },
+        aspect: { type: "string", enum: VALID_ASPECTS, description: "Aspect ratio — 1:1 (default), 16:9, 9:16, 4:3" },
+      },
+      required: ["prompt"],
+    },
+  },
+  {
+    name: "generate_pro",
+    description: "Generate an AI image with background removed AND upscaled 4x HD. The full pipeline. Costs $0.30 USDC on Base mainnet.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: { type: "string", description: "Text description of the subject (background removed, then upscaled)" },
+        aspect: { type: "string", enum: VALID_ASPECTS, description: "Aspect ratio — 1:1 (default), 16:9, 9:16, 4:3" },
+      },
+      required: ["prompt"],
+    },
+  },
 ];
 
-function loadPrivateKey() {
-  // Prefer explicit env var (required for published/distributed use)
-  if (process.env.WALLET_PRIVATE_KEY) return process.env.WALLET_PRIVATE_KEY;
-
-  // Fall back to REDACTED_ENV_VAR from the local imagegen .env (local dev convenience)
-  try {
-    const envPath = path.join(os.homedir(), "dev", "x402-imagegen", ".env");
-    const content = fs.readFileSync(envPath, "utf-8");
-    const match = content.match(/^REDACTED_ENV_VAR=(.+)$/m);
-    if (match) return match[1].trim();
-  } catch (_) {}
-
-  return null;
-}
+const TOOL_ENDPOINTS = {
+  generate_image: { path: "/generate", price: "$0.10" },
+  generate_clean: { path: "/generate/clean", price: "$0.15" },
+  generate_hd:    { path: "/generate/hd",    price: "$0.20" },
+  generate_pro:   { path: "/generate/pro",   price: "$0.30" },
+};
 
 function buildHttpClient() {
-  const key = loadPrivateKey();
+  const key = process.env.WALLET_PRIVATE_KEY;
   if (!key) {
     throw new Error(
-      "WALLET_PRIVATE_KEY required — set a Base wallet private key funded with USDC. " +
-      "Each generate_image call costs $0.10 USDC on Base mainnet."
+      "WALLET_PRIVATE_KEY required — set a Base wallet private key funded with USDC.\n" +
+      "  generate_image = $0.10 | generate_clean = $0.15 | generate_hd = $0.20 | generate_pro = $0.30"
     );
   }
-
   const pk = key.startsWith("0x") ? key : "0x" + key;
   const account = privateKeyToAccount(pk);
   const signer = toClientEvmSigner(account);
@@ -68,8 +85,11 @@ function buildHttpClient() {
   return new x402HTTPClient(coreClient);
 }
 
-async function callPaid(httpClient, url) {
-  const res = await fetch(url);
+async function callPaid(httpClient, path, params) {
+  const url = new URL(BASE_URL + path);
+  if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+
+  const res = await fetch(url.toString());
 
   if (res.status === 402) {
     let body;
@@ -79,12 +99,12 @@ async function callPaid(httpClient, url) {
       body
     );
     const paymentPayload = await httpClient.createPaymentPayload(paymentRequired);
-    const paidRes = await fetch(url, {
+    const paidRes = await fetch(url.toString(), {
       headers: httpClient.encodePaymentSignatureHeader(paymentPayload),
     });
     if (!paidRes.ok) {
       const errBody = await paidRes.text().catch(() => paidRes.statusText);
-      throw new Error(`HTTP ${paidRes.status}: ${errBody.slice(0, 200)}`);
+      throw new Error(`Payment failed — HTTP ${paidRes.status}: ${errBody.slice(0, 200)}`);
     }
     return paidRes.json();
   }
@@ -101,12 +121,12 @@ async function main() {
   try {
     httpClient = buildHttpClient();
   } catch (e) {
-    process.stderr.write("[imagegen-mcp] " + e.message + "\n");
+    process.stderr.write("[forgemesh-imagegen] " + e.message + "\n");
     process.exit(1);
   }
 
   const server = new Server(
-    { name: "imagegen-mcp", version: "1.0.0" },
+    { name: "forgemesh-imagegen", version: "1.0.0" },
     { capabilities: { tools: {} } }
   );
 
@@ -115,20 +135,22 @@ async function main() {
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
     const { name, arguments: args } = req.params;
     try {
-      if (name !== "generate_image") throw new Error("Unknown tool: " + name);
+      const endpoint = TOOL_ENDPOINTS[name];
+      if (!endpoint) throw new Error("Unknown tool: " + name);
 
       if (!args.prompt || typeof args.prompt !== "string" || !args.prompt.trim()) {
         throw new Error("prompt is required and must be a non-empty string");
       }
 
       const aspect = args.aspect || "1:1";
-      const validAspects = ["1:1", "16:9", "9:16", "4:3"];
-      if (!validAspects.includes(aspect)) {
-        throw new Error(`Invalid aspect ratio '${aspect}'. Valid values: ${validAspects.join(", ")}`);
+      if (!VALID_ASPECTS.includes(aspect)) {
+        throw new Error(`Invalid aspect ratio '${aspect}'. Valid: ${VALID_ASPECTS.join(", ")}`);
       }
 
-      const url = `${BASE_URL}/generate?prompt=${encodeURIComponent(args.prompt.trim())}&aspect=${encodeURIComponent(aspect)}`;
-      const data = await callPaid(httpClient, url);
+      const data = await callPaid(httpClient, endpoint.path, {
+        prompt: args.prompt.trim(),
+        aspect,
+      });
 
       return {
         content: [{
@@ -137,9 +159,10 @@ async function main() {
             image_url: data.image_url,
             prompt: data.prompt,
             aspect: data.aspect,
-            generated_at: data.generated_at || new Date().toISOString()
-          }, null, 2)
-        }]
+            tier: name.replace("generate_", "") || "base",
+            generated_at: data.generated_at || new Date().toISOString(),
+          }, null, 2),
+        }],
       };
     } catch (e) {
       return { content: [{ type: "text", text: "Error: " + e.message }], isError: true };

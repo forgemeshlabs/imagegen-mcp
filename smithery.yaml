@@ -8,13 +8,13 @@ startCommand:
       walletPrivateKey:
         type: string
         description: >-
-          Dedicated low-balance Base wallet private key for x402 USDC micropayments.
-          Use a purpose-built wallet, not your primary wallet.
-          $1 USDC covers approximately 10 image generations.
+          Base wallet private key for x402 USDC micropayments.
+          Use a dedicated low-balance wallet — not your primary wallet.
+          $1 USDC covers ~3-10 images depending on tier.
   commandFunction: |-
     (config) => ({
       command: 'npx',
-      args: ['-y', 'coinopai-imagegen'],
+      args: ['-y', 'forgemesh-imagegen'],
       env: {
         WALLET_PRIVATE_KEY: config.walletPrivateKey
       }
