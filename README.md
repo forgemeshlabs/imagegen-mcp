@@ -86,14 +86,14 @@ Each tool call makes an HTTP request to the ForgeMesh imagegen service gated by 
 
 - Network: Base mainnet (eip155:8453)
 - Token: USDC
-- Facilitator: Coinbase CDP
+- Protocol: [x402](https://x402.org)
 
 ---
 
 ## Links
 
 - [ForgeMesh](https://forgemesh.io) — ecosystem overview
-- [GitHub](https://github.com/forgemeshlabs/forgemesh-imagegen)
+- [npm](https://www.npmjs.com/package/forgemesh-imagegen)
 - [x402 Protocol](https://x402.org)
 
 ---

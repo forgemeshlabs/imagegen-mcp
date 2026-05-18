@@ -3,7 +3,7 @@
   "name": "io.github.forgemeshlabs/imagegen-mcp",
   "description": "AI image generation MCP — generate, bg removal, 4x upscale, or full pro pipeline. USDC/Base.",
   "repository": {
-    "url": "https://github.com/forgemeshlabs/forgemesh-imagegen",
+    "url": "https://github.com/forgemeshlabs/imagegen-mcp",
     "source": "github"
   },
   "version": "1.0.0",
