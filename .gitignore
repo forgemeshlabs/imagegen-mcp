@@ -4,4 +4,5 @@ node_modules/
 *.log
 .DS_Store
 .claude/
-REDACTED_INTERNAL_FILE
+.agents/
+.codex/
