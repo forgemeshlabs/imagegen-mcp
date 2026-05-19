@@ -8,9 +8,23 @@ const { x402Client, x402HTTPClient } = require("@x402/core/client");
 const { ExactEvmScheme } = require("@x402/evm/exact/client");
 const { toClientEvmSigner } = require("@x402/evm");
 const { privateKeyToAccount } = require("viem/accounts");
+const { createPublicClient, createWalletClient, http, parseAbi } = require("viem");
+const { base } = require("viem/chains");
 
 const BASE_URL = "https://imagegen.coinopai.com";
 const VALID_ASPECTS = ["1:1", "16:9", "9:16", "4:3"];
+const PYRIMID_ROUTER = "0xc949AEa380D7b7984806143ddbfE519B03ABd68B";
+const PYRIMID_VENDOR_ID = "0x034604e25078e293d7b181fa23b3f2f6";
+const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+const ROUTER_ABI = parseAbi([
+  "function routePayment(bytes16 vendorId, uint256 productId, bytes16 affiliateId, address buyer, uint256 maxPrice) external",
+]);
+const USDC_ABI = parseAbi([
+  "function approve(address spender, uint256 amount) external returns (bool)",
+]);
+const PYRIMID_PRODUCTS = {
+  "/generate": { productId: 3n, priceUsdc: 100000n },
+};
 
 const TOOLS = [
   {
@@ -21,6 +35,7 @@ const TOOLS = [
       properties: {
         prompt: { type: "string", description: "Text description of the image to generate" },
         aspect: { type: "string", enum: VALID_ASPECTS, description: "Aspect ratio — 1:1 (default), 16:9, 9:16, 4:3" },
+        affiliate_id: { type: "string", description: "Optional Pyrimid affiliate ID. Affiliate earns a commission from within the listed price — no extra cost to you." },
       },
       required: ["prompt"],
     },
@@ -82,14 +97,63 @@ function buildHttpClient() {
   const account = privateKeyToAccount(pk);
   const signer = toClientEvmSigner(account);
   const coreClient = new x402Client().register("eip155:*", new ExactEvmScheme(signer));
-  return new x402HTTPClient(coreClient);
+  return { httpClient: new x402HTTPClient(coreClient), account };
 }
 
-async function callPaid(httpClient, path, params) {
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+async function callPyrimid(account, url, product, affiliateId) {
+  const transport = http();
+  const publicClient = createPublicClient({ chain: base, transport });
+  const walletClient = createWalletClient({ account, chain: base, transport });
+
+  const approveHash = await walletClient.writeContract({
+    address: USDC_ADDRESS,
+    abi: USDC_ABI,
+    functionName: "approve",
+    args: [PYRIMID_ROUTER, product.priceUsdc],
+  });
+  await publicClient.waitForTransactionReceipt({ hash: approveHash });
+  await sleep(3000);
+
+  const routeHash = await walletClient.writeContract({
+    address: PYRIMID_ROUTER,
+    abi: ROUTER_ABI,
+    functionName: "routePayment",
+    args: [PYRIMID_VENDOR_ID, product.productId, "0x00000000000000000000000000000000", account.address, product.priceUsdc],
+  });
+  await publicClient.waitForTransactionReceipt({ hash: routeHash });
+  await sleep(3000);
+
+  const paidRes = await fetch(url.toString(), {
+    headers: { "X-Affiliate-ID": affiliateId, "X-Payment": routeHash },
+  });
+  if (!paidRes.ok) {
+    const errBody = await paidRes.text().catch(() => paidRes.statusText);
+    throw new Error(`Pyrimid payment failed — HTTP ${paidRes.status}: ${errBody.slice(0, 200)}`);
+  }
+  return paidRes.json();
+}
+
+async function callPaid(ctx, path, params, affiliateId) {
+  const { httpClient, account } = ctx;
   const url = new URL(BASE_URL + path);
   if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
 
-  const res = await fetch(url.toString());
+  const product = PYRIMID_PRODUCTS[path];
+  if (!product) affiliateId = null;
+  const extraHeaders = affiliateId ? { "X-Affiliate-ID": affiliateId } : {};
+
+  if (affiliateId && product) {
+    try {
+      return await callPyrimid(account, url, product, affiliateId);
+    } catch (_) {
+      affiliateId = null;
+    }
+  }
+
+  const directHeaders = affiliateId ? extraHeaders : {};
+  const res = await fetch(url.toString(), { headers: directHeaders });
 
   if (res.status === 402) {
     let body;
@@ -100,7 +164,7 @@ async function callPaid(httpClient, path, params) {
     );
     const paymentPayload = await httpClient.createPaymentPayload(paymentRequired);
     const paidRes = await fetch(url.toString(), {
-      headers: httpClient.encodePaymentSignatureHeader(paymentPayload),
+      headers: { ...httpClient.encodePaymentSignatureHeader(paymentPayload), ...directHeaders },
     });
     if (!paidRes.ok) {
       const errBody = await paidRes.text().catch(() => paidRes.statusText);
@@ -117,9 +181,9 @@ async function callPaid(httpClient, path, params) {
 }
 
 async function main() {
-  let httpClient;
+  let ctx;
   try {
-    httpClient = buildHttpClient();
+    ctx = buildHttpClient();
   } catch (e) {
     process.stderr.write("[forgemesh-imagegen] " + e.message + "\n");
     process.exit(1);
@@ -147,10 +211,11 @@ async function main() {
         throw new Error(`Invalid aspect ratio '${aspect}'. Valid: ${VALID_ASPECTS.join(", ")}`);
       }
 
-      const data = await callPaid(httpClient, endpoint.path, {
+      const affiliateId = args.affiliate_id || process.env.PYRIMID_AFFILIATE_ID || null;
+      const data = await callPaid(ctx, endpoint.path, {
         prompt: args.prompt.trim(),
         aspect,
-      });
+      }, affiliateId);
 
       return {
         content: [{
