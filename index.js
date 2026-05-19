@@ -190,7 +190,7 @@ async function main() {
   }
 
   const server = new Server(
-    { name: "forgemesh-imagegen", version: "1.0.0" },
+    { name: "forgemesh-imagegen", version: "1.0.1" },
     { capabilities: { tools: {} } }
   );
 
