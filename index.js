@@ -23,13 +23,13 @@ const USDC_ABI = parseAbi([
   "function approve(address spender, uint256 amount) external returns (bool)",
 ]);
 const PYRIMID_PRODUCTS = {
-  "/generate": { productId: 3n, priceUsdc: 100000n },
+  "/generate": { productId: 3n, priceUsdc: 250000n },
 };
 
 const TOOLS = [
   {
     name: "generate_image",
-    description: "Generate an AI image from a text prompt. Returns a PNG image URL. Costs $0.10 USDC on Base mainnet — paid automatically.",
+    description: "Generate a standard AI image from a text prompt. Returns a PNG image URL. Costs $0.25 USDC on Base mainnet — paid automatically.",
     inputSchema: {
       type: "object",
       properties: {
@@ -42,7 +42,7 @@ const TOOLS = [
   },
   {
     name: "generate_clean",
-    description: "Generate an AI image with the background removed. Returns a transparent PNG URL. Costs $0.15 USDC on Base mainnet.",
+    description: "Generate an AI image with background removed. Returns a transparent PNG URL. Costs $0.35 USDC on Base mainnet.",
     inputSchema: {
       type: "object",
       properties: {
@@ -54,7 +54,7 @@ const TOOLS = [
   },
   {
     name: "generate_hd",
-    description: "Generate an AI image upscaled to 4x resolution. Returns a high-resolution image URL. Costs $0.20 USDC on Base mainnet.",
+    description: "Generate a premium AI image upscaled 4x HD. Returns a high-resolution image URL. Costs $0.50 USDC on Base mainnet.",
     inputSchema: {
       type: "object",
       properties: {
@@ -66,7 +66,7 @@ const TOOLS = [
   },
   {
     name: "generate_pro",
-    description: "Generate an AI image with background removed AND upscaled 4x HD. The full pipeline. Costs $0.30 USDC on Base mainnet.",
+    description: "Generate a top-tier AI image with background removal and 4x HD upscale. Costs $0.75 USDC on Base mainnet.",
     inputSchema: {
       type: "object",
       properties: {
@@ -79,10 +79,10 @@ const TOOLS = [
 ];
 
 const TOOL_ENDPOINTS = {
-  generate_image: { path: "/generate", price: "$0.10" },
-  generate_clean: { path: "/generate/clean", price: "$0.15" },
-  generate_hd:    { path: "/generate/hd",    price: "$0.20" },
-  generate_pro:   { path: "/generate/pro",   price: "$0.30" },
+  generate_image: { path: "/generate", price: "$0.25" },
+  generate_clean: { path: "/generate/clean", price: "$0.35" },
+  generate_hd:    { path: "/generate/hd",    price: "$0.50" },
+  generate_pro:   { path: "/generate/pro",   price: "$0.75" },
 };
 
 function buildHttpClient() {
@@ -90,7 +90,7 @@ function buildHttpClient() {
   if (!key) {
     throw new Error(
       "WALLET_PRIVATE_KEY required — set a Base wallet private key funded with USDC.\n" +
-      "  generate_image = $0.10 | generate_clean = $0.15 | generate_hd = $0.20 | generate_pro = $0.30"
+      "  generate_image = $0.25 | generate_clean = $0.35 | generate_hd = $0.50 | generate_pro = $0.75"
     );
   }
   const pk = key.startsWith("0x") ? key : "0x" + key;
@@ -190,7 +190,7 @@ async function main() {
   }
 
   const server = new Server(
-    { name: "forgemesh-imagegen", version: "1.0.1" },
+    { name: "forgemesh-imagegen", version: "1.0.2" },
     { capabilities: { tools: {} } }
   );
 

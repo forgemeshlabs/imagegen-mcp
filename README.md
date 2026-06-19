@@ -10,10 +10,10 @@ Part of the [ForgeMesh](https://github.com/forgemeshlabs/forgemesh) ecosystem �
 
 | Tool | What it does | Price |
 |---|---|---|
-| `generate_image` | Text-to-image generation | $0.10 USDC |
-| `generate_clean` | Generate + background removal | $0.15 USDC |
-| `generate_hd` | Generate + 4x upscale (HD) | $0.20 USDC |
-| `generate_pro` | Generate + bg removal + 4x upscale | $0.30 USDC |
+| `generate_image` | Standard text-to-image generation | $0.25 USDC |
+| `generate_clean` | Generate + background removal | $0.35 USDC |
+| `generate_hd` | Premium generate + 4x upscale (HD) | $0.50 USDC |
+| `generate_pro` | Top-tier generate + bg removal + 4x upscale | $0.75 USDC |
 
 All tools accept `prompt` (required) and `aspect` (optional: `1:1`, `16:9`, `9:16`, `4:3`).
 `generate_image` also accepts `affiliate_id` for Pyrimid attribution, or uses `PYRIMID_AFFILIATE_ID` from the environment.
@@ -57,7 +57,7 @@ export WALLET_PRIVATE_KEY=0x...
 ## Requirements
 
 - A Base mainnet wallet private key with USDC
-- $1 USDC ≈ 10 base images, 6 clean, 5 HD, or 3 pro
+- $1 USDC ≈ 4 base images, 2 clean, 2 HD, or 1 pro
 - No other API keys needed
 
 Get USDC on Base: [Coinbase](https://coinbase.com) → Bridge to Base, or buy directly on Base.

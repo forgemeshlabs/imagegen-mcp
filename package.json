@@ -1,6 +1,6 @@
 {
   "name": "forgemesh-imagegen",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "mcpName": "io.github.forgemeshlabs/imagegen-mcp",
   "description": "MCP server for AI image generation — generate, clean (bg removal), HD (4x upscale), Pro. Pay per image in USDC via x402 on Base. No API key needed.",
   "main": "index.js",
