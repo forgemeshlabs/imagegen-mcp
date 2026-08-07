@@ -1,6 +1,6 @@
 {
   "name": "forgemesh-imagegen",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "mcpName": "io.github.forgemeshlabs/imagegen-mcp",
   "description": "MCP server for AI image generation — generate, clean (bg removal), HD (4x upscale), Pro. Pay per image in USDC via x402 on Base. No API key needed.",
   "main": "index.js",
@@ -15,7 +15,7 @@
     "start": "node index.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "keywords": [
     "mcp",
@@ -48,7 +48,7 @@
     "url": "https://github.com/forgemeshlabs/imagegen-mcp/issues"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.10.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@x402/core": "^2.11.0",
     "@x402/evm": "^2.11.0",
     "viem": "^2.0.0"
