@@ -1,5 +1,7 @@
 # forgemesh-imagegen
 
+[![M8ven Verified](https://m8ven.ai/badge/mcp/forgemeshlabs-imagegen-mcp-5nc38d?variant=verified)](https://m8ven.ai/mcp/forgemeshlabs-imagegen-mcp-5nc38d)
+
 **MCP server for AI image generation.** Generate images, remove backgrounds, upscale to 4x HD — all from a single MCP tool call. Payments handled automatically in USDC on Base mainnet via x402. No API key. No subscription. Pay per image.
 
 Part of the [ForgeMesh](https://github.com/forgemeshlabs/forgemesh) ecosystem — infrastructure for autonomous agents.
