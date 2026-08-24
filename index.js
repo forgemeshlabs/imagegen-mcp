@@ -29,6 +29,12 @@ const PYRIMID_PRODUCTS = {
 const TOOLS = [
   {
     name: "generate_image",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Generate a standard AI image from a text prompt. Returns a PNG image URL. Costs $0.25 USDC on Base mainnet — paid automatically.",
     inputSchema: {
       type: "object",
@@ -42,6 +48,12 @@ const TOOLS = [
   },
   {
     name: "generate_clean",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Generate an AI image with background removed. Returns a transparent PNG URL. Costs $0.35 USDC on Base mainnet.",
     inputSchema: {
       type: "object",
@@ -54,6 +66,12 @@ const TOOLS = [
   },
   {
     name: "generate_hd",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Generate a premium AI image upscaled 4x HD. Returns a high-resolution image URL. Costs $0.50 USDC on Base mainnet.",
     inputSchema: {
       type: "object",
@@ -66,6 +84,12 @@ const TOOLS = [
   },
   {
     name: "generate_pro",
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
     description: "Generate a top-tier AI image with background removal and 4x HD upscale. Costs $0.75 USDC on Base mainnet.",
     inputSchema: {
       type: "object",
