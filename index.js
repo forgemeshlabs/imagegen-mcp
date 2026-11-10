@@ -30,7 +30,7 @@ const TOOLS = [
   {
     name: "generate_image",
     annotations: GENERATE_ANNOTATIONS,
-    description: "Generate a standard AI image from a text prompt. Returns a PNG image URL. Costs $0.25 USDC on Base mainnet — paid automatically.",
+    description: "Generate a standard AI image from a text prompt. Returns a PNG image URL. Costs $0.05 USDC on Base mainnet — paid automatically.",
     inputSchema: promptSchema("Text description of the image to generate"),
   },
   {
@@ -42,7 +42,7 @@ const TOOLS = [
   {
     name: "generate_hd",
     annotations: GENERATE_ANNOTATIONS,
-    description: "Generate a premium AI image upscaled 4x HD. Returns a high-resolution image URL. Costs $0.50 USDC on Base mainnet.",
+    description: "Generate a premium AI image upscaled 4x HD. Returns a high-resolution image URL. Costs $0.10 USDC on Base mainnet.",
     inputSchema: promptSchema("Text description of the image to generate"),
   },
   {
@@ -75,9 +75,9 @@ const TOOLS = [
 ];
 
 const TOOL_ENDPOINTS = {
-  generate_image:  { path: "/generate", price: "$0.25" },
+  generate_image:  { path: "/generate", price: "$0.05" },
   generate_clean:  { path: "/generate/clean", price: "$0.35" },
-  generate_hd:     { path: "/generate/hd",    price: "$0.50" },
+  generate_hd:     { path: "/generate/hd",    price: "$0.10" },
   generate_pro:    { path: "/generate/pro",   price: "$0.75" },
   list_presets:    { path: "/presets",        price: "$0.005" },
   transform_image: { path: "/transform",      price: "$0.75" },
@@ -88,7 +88,7 @@ function buildHttpClient() {
   if (!key) {
     throw new Error(
       "WALLET_PRIVATE_KEY required — set a dedicated, low-balance Base wallet private key funded with USDC.\n" +
-      "  generate_image = $0.25 | generate_clean = $0.35 | generate_hd = $0.50 | generate_pro = $0.75 | transform_image = $0.75"
+      "  generate_image = $0.05 | generate_clean = $0.35 | generate_hd = $0.10 | generate_pro = $0.75 | transform_image = $0.75"
     );
   }
   const pk = key.startsWith("0x") ? key : "0x" + key;

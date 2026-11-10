@@ -13,9 +13,9 @@ Part of the [ForgeMesh](https://github.com/forgemeshlabs/forgemesh) ecosystem â€
 
 | Tool | What it does | Price |
 |---|---|---|
-| `generate_image` | Standard text-to-image generation | $0.25 USDC |
+| `generate_image` | Standard text-to-image generation | $0.05 USDC |
 | `generate_clean` | Generate + background removal | $0.35 USDC |
-| `generate_hd` | Premium generate + 4x upscale (HD) | $0.50 USDC |
+| `generate_hd` | Premium generate + 4x upscale (HD) | $0.10 USDC |
 | `generate_pro` | Top-tier generate + bg removal + 4x upscale | $0.75 USDC |
 | `list_presets` | List the 58 identity-preserving transform presets (person or pet) | $0.005 USDC |
 | `transform_image` | Transform a photo with a preset while keeping the subject's identity (FLUX Kontext Max) | $0.75 USDC |
