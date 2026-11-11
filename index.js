@@ -30,37 +30,37 @@ const TOOLS = [
   {
     name: "generate_image",
     annotations: GENERATE_ANNOTATIONS,
-    description: "Generate a standard AI image from a text prompt. Returns a PNG image URL. Costs $0.05 USDC on Base mainnet — paid automatically.",
+    description: "Image generation: text prompt to image (text-to-image) with FLUX Schnell. Pass prompt and optional aspect (1:1, 16:9, 9:16 or 4:3). Returns the image URL with prompt, aspect and model. Use it for illustrations, thumbnails, mockups and social images. Costs $0.05 USDC on Base mainnet, paid automatically.",
     inputSchema: promptSchema("Text description of the image to generate"),
   },
   {
     name: "generate_clean",
     annotations: GENERATE_ANNOTATIONS,
-    description: "Generate an AI image with background removed. Returns a transparent PNG URL. Costs $0.35 USDC on Base mainnet.",
+    description: "Image generation with transparent background: text prompt to image with FLUX Schnell, then automatic background removal. Returns the URL of a transparent PNG cutout. Use it for product cutouts, stickers and logo marks. Costs $0.35 USDC on Base mainnet.",
     inputSchema: promptSchema("Text description of the subject (background will be removed)"),
   },
   {
     name: "generate_hd",
     annotations: GENERATE_ANNOTATIONS,
-    description: "Generate a premium AI image upscaled 4x HD. Returns a high-resolution image URL. Costs $0.10 USDC on Base mainnet.",
+    description: "High-resolution image generation: text prompt to image with FLUX 1.1 Pro plus a 4x Real-ESRGAN upscale, run as an async job. Returns the job (job_id, status, status_url); poll status_url until it succeeds to read image_url. Costs $0.10 USDC on Base mainnet.",
     inputSchema: promptSchema("Text description of the image to generate"),
   },
   {
     name: "generate_pro",
     annotations: GENERATE_ANNOTATIONS,
-    description: "Generate a top-tier AI image with background removal and 4x HD upscale. Costs $0.75 USDC on Base mainnet.",
+    description: "Premium image generation: text prompt to image with FLUX Kontext Max, background removal and a 4x upscale, run as an async job. Returns the job (job_id, status, status_url); poll status_url until it succeeds to read image_url. Costs $0.75 USDC on Base mainnet.",
     inputSchema: promptSchema("Text description of the subject (background removed, then upscaled)"),
   },
   {
     name: "list_presets",
     annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true },
-    description: "List the 58 identity-preserving transform presets for transform_image (action figure, pet royalty, CEO portrait, cartoon villain, fantasy poster, pet astronaut, ...). Returns id, title, tagline and whether each expects a person or a pet photo. Costs $0.005 USDC on Base mainnet.",
+    description: "Photo transform presets: list the 58 identity-preserving image-to-image styles for transform_image (action figure, pet royalty, CEO portrait, cartoon villain, fantasy poster, pet astronaut, ...). Returns id, title, tagline and whether each expects a person or a pet photo. Costs $0.005 USDC on Base mainnet.",
     inputSchema: { type: "object", properties: {}, required: [] },
   },
   {
     name: "transform_image",
     annotations: GENERATE_ANNOTATIONS,
-    description: "Transform a photo with a named preset while keeping the subject's identity (FLUX Kontext Max image-to-image). Pass a public https image URL and a preset id from list_presets. Returns a job with a free status_url to poll until the PNG is ready (usually 15-30s). Costs $0.75 USDC on Base mainnet. Submit only images you have rights to; no minors; provider safety filter applies.",
+    description: "Photo transform (image-to-image): restyle a photo with a named preset while keeping the subject's identity, using FLUX Kontext Max. Pass a public https image URL and a preset id from list_presets. Returns a job with a free status_url to poll until the PNG is ready (usually 15-30s). Costs $0.75 USDC on Base mainnet. Submit only images you have rights to; no minors; provider safety filter applies.",
     inputSchema: {
       type: "object",
       properties: {
