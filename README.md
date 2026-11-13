@@ -23,6 +23,8 @@ Part of the [ForgeMesh](https://github.com/forgemeshlabs/forgemesh) ecosystem â€
 The four `generate_*` tools accept `prompt` (required) and `aspect` (optional: `1:1`, `16:9`, `9:16`, `4:3`).
 `transform_image` takes a public `image_url`, a `preset` id from `list_presets`, an optional `aspect` (`match_input_image` default, or `1:1`, `16:9`, `9:16`, `4:3`, `3:4`) and `wait` (default true: polls the free status URL until the PNG is ready, usually 15-30s). Submit only images you have rights to; no minors; the provider safety filter applies.
 
+`generate_hd`, `generate_pro` and `transform_image` run as async jobs: the tool polls the free status URL (default `wait` true, up to ~90s) and returns `image_url` plus `expires_at` (images are stored 7 days). If a job fails on the service's side (infrastructure or model host), the result carries a `retry_credit`; call the same tool again with `retry_credit` set to that value for one free retry (single use, 72 hours, same wallet, no new payment). Safety rejections and unclear failures after payment get no automatic retry and are logged for manual review (hello@forgemesh.io, quote the job id). Synchronous `generate_image` / `generate_clean` renders not finished within 85 seconds answer 504 and are not charged.
+
 ---
 
 ## Install
