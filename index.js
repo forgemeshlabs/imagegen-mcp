@@ -155,9 +155,15 @@ function refusalError(res, paidAttempt) {
   else if (!paidAttempt) charged = false;
   else charged = res.headers.get("payment-response") || res.headers.get("x-payment-response") ? true : "unknown (no settlement receipt)";
   const reason = body && typeof body === "object" ? (body.error || body.reason || body.message || body.invalidReason) : undefined;
-  const detail = reason ? (typeof reason === "string" ? reason : JSON.stringify(reason)) : res.text.slice(0, 500);
   const retryAfter = res.headers.get("retry-after");
-  return new Error(`HTTP ${res.status} (charged:${charged})${retryAfter ? ` retry-after:${retryAfter}s` : ""}: ${detail}`);
+  // Fixed message (status, charged, optional short error code); the service body travels only as capped data.
+  const code = typeof reason === "string" && /^[a-z0-9_.:-]{1,64}$/i.test(reason) ? `: ${reason}` : "";
+  const err = new Error(`HTTP ${res.status} (charged:${charged})${retryAfter ? ` retry-after:${retryAfter}s` : ""}${code}`);
+  err.status = res.status;
+  err.charged = charged;
+  const raw = body && typeof body === "object" ? JSON.stringify(body) : res.text;
+  err.upstream = body && typeof body === "object" && raw.length <= 1500 ? body : raw.slice(0, body && typeof body === "object" ? 1500 : 500);
+  return err;
 }
 
 // Poll a job's free status_url until it succeeds or fails (up to ~90s).
@@ -268,6 +274,9 @@ async function main() {
         }],
       };
     } catch (e) {
+      if (e && e.status !== undefined) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: e.message, status: e.status, charged: e.charged, upstream: e.upstream, untrusted: true }) }], isError: true };
+      }
       return { content: [{ type: "text", text: "Error: " + e.message }], isError: true };
     }
   });
